@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR.js with Dinosaur Model</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+    <script>
+      AFRAME.registerComponent('gesture-detector', {
+        schema: {
+          enabled: { default: true }
+        },
+        init: function () {
+          this.handleGesture = this.handleGesture.bind(this);
+          this.el.sceneEl.canvas.addEventListener('touchstart', this.handleGesture);
+          this.el.sceneEl.canvas.addEventListener('touchmove', this.handleGesture);
+          this.previousX = null;
+          this.previousY = null;
+        },
+        remove: function () {
+          this.el.sceneEl.canvas.removeEventListener('touchstart', this.handleGesture);
+          this.el.sceneEl.canvas.removeEventListener('touchmove', this.handleGesture);
+        },
+        handleGesture: function (event) {
+          if (!this.data.enabled) return;
+          const touch = event.touches[0];
+
+          if (event.type === 'touchstart') {
+            this.previousX = touch.clientX;
+            this.previousY = touch.clientY;
+          }
+
+          if (event.type === 'touchmove') {
+            const deltaX = touch.clientX - this.previousX;
+            const deltaY = touch.clientY - this.previousY;
+            this.previousX = touch.clientX;
+            this.previousY = touch.clientY;
+
+
+            const rotation = this.el.getAttribute('rotation');
+            rotation.y += deltaX * 0.5;
+            rotation.x += deltaY * 0.5; // Adjust this factor to change rotation speed
+            this.el.setAttribute('rotation', rotation);
+          }
+        }
+      });
+    </script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs device-orientation-permission-ui="enabled: false">
+
+      <!-- Marker Custom model Chibi Alice -->
+      <a-marker type="pattern" url="https://raw.githubusercontent.com/SoraIroShiro/arjsmodel/main/chibiarisumarker/pattern-aris-dancing-arisu-blue-archive.patt">
+        <a-entity 
+          gltf-model="url(https://raw.githubusercontent.com/SoraIroShiro/arjsmodel/main/chibialice_dance/scene.gltf)" 
+          scale="4 4 4"
+          position="0 0 0"
+          gesture-detector>
+        </a-entity>
+      </a-marker>
+
+      <a-marker preset="hiro">
+        <!-- Marker Hiro 3D Model Miyu -->
+        <a-entity 
+          gltf-model="url(https://raw.githubusercontent.com/SoraIroShiro/arjsmodel/main/blue_archivekasumizawa_miyu/scene.gltf)" 
+          scale="4 4 4"
+          position="0 0 0"
+          gesture-detector>
+        </a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="https://raw.githubusercontent.com/SoraIroShiro/arjsmodel/main/new%20nazi%20mark/pattern-nazi-logo-2CBC29K.patt">
+        <!-- Marker Custom 3D Model Porsche -->
+        <a-entity 
+          gltf-model="url(https://raw.githubusercontent.com/SoraIroShiro/arjsmodel/main/matilda/scene.gltf)" 
+          scale="0.025 0.025 0.025"
+          position="0 0 0"
+          gesture-detector>
+        </a-entity>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
